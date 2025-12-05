@@ -1,4 +1,15 @@
 #include "Display_ST7789.h"
+
+/* Current rotation setting */
+lcd_rotation_t LCD_Rotation = LCD_ROTATION_0;
+
+/* MADCTL register bit definitions for ST7789 */
+#define MADCTL_MY  0x80  // Row Address Order
+#define MADCTL_MX  0x40  // Column Address Order  
+#define MADCTL_MV  0x20  // Row/Column Exchange
+#define MADCTL_ML  0x10  // Vertical Refresh Order
+#define MADCTL_RGB 0x00  // RGB color order
+#define MADCTL_BGR 0x08  // BGR color order
    
 SPIClass LCDspi(FSPI);
 void SPI_Init()
@@ -67,8 +78,9 @@ void LCD_Init(void)
   delay(120);         
   LCD_WriteCommand(0x11);     
   delay(120);                //ms            
-  LCD_WriteCommand(0x36);     
-  LCD_WriteData(0x00);   
+  
+  /* Set default rotation */
+  LCD_SetRotation(LCD_Rotation);
 
   LCD_WriteCommand(0x3A);     
   LCD_WriteData(0x05);   
@@ -163,35 +175,20 @@ parameter :
 ******************************************************************************/
 void LCD_SetCursor(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t  Yend)
 { 
-  if (HORIZONTAL) {
-    // set the X coordinates
-    LCD_WriteCommand(0x2A);
-    LCD_WriteData(Xstart >> 8);
-    LCD_WriteData(Xstart + Offset_X);
-    LCD_WriteData(Xend >> 8);
-    LCD_WriteData(Xend + Offset_X);
-    
-    // set the Y coordinates
-    LCD_WriteCommand(0x2B);
-    LCD_WriteData(Ystart >> 8);
-    LCD_WriteData(Ystart + Offset_Y);
-    LCD_WriteData(Yend >> 8);
-    LCD_WriteData(Yend + Offset_Y);
-  }
-  else {
-    // set the X coordinates
-    LCD_WriteCommand(0x2A);
-    LCD_WriteData(Ystart >> 8);
-    LCD_WriteData(Ystart + Offset_Y);
-    LCD_WriteData(Yend >> 8);
-    LCD_WriteData(Yend + Offset_Y);
-    // set the Y coordinates
-    LCD_WriteCommand(0x2B);
-    LCD_WriteData(Xstart >> 8);
-    LCD_WriteData(Xstart + Offset_X);
-    LCD_WriteData(Xend >> 8);
-    LCD_WriteData(Xend + Offset_X);
-  }
+  // set the X coordinates
+  LCD_WriteCommand(0x2A);
+  LCD_WriteData((Xstart + Offset_X) >> 8);
+  LCD_WriteData((Xstart + Offset_X) & 0xFF);
+  LCD_WriteData((Xend + Offset_X) >> 8);
+  LCD_WriteData((Xend + Offset_X) & 0xFF);
+  
+  // set the Y coordinates
+  LCD_WriteCommand(0x2B);
+  LCD_WriteData((Ystart + Offset_Y) >> 8);
+  LCD_WriteData((Ystart + Offset_Y) & 0xFF);
+  LCD_WriteData((Yend + Offset_Y) >> 8);
+  LCD_WriteData((Yend + Offset_Y) & 0xFF);
+  
   LCD_WriteCommand(0x2C);
 }
 /******************************************************************************
@@ -234,5 +231,56 @@ void Set_Backlight(uint8_t Light)
   }
 }
 
+/******************************************************************************
+function: Get current display width based on rotation
+******************************************************************************/
+uint16_t LCD_GetWidth(void)
+{
+  if (LCD_Rotation == LCD_ROTATION_90 || LCD_Rotation == LCD_ROTATION_270) {
+    return LCD_HEIGHT;  // Landscape: width = 320
+  }
+  return LCD_WIDTH;     // Portrait: width = 240
+}
 
+/******************************************************************************
+function: Get current display height based on rotation
+******************************************************************************/
+uint16_t LCD_GetHeight(void)
+{
+  if (LCD_Rotation == LCD_ROTATION_90 || LCD_Rotation == LCD_ROTATION_270) {
+    return LCD_WIDTH;   // Landscape: height = 240
+  }
+  return LCD_HEIGHT;    // Portrait: height = 320
+}
 
+/******************************************************************************
+function: Set the display rotation
+parameter:
+    rotation: LCD_ROTATION_0, LCD_ROTATION_90, LCD_ROTATION_180, LCD_ROTATION_270
+    
+MADCTL (Memory Data Access Control) Register 0x36:
+    Bit 7 (MY):  Row Address Order
+    Bit 6 (MX):  Column Address Order
+    Bit 5 (MV):  Row/Column Exchange
+    Bit 3 (RGB): RGB-BGR Order
+******************************************************************************/
+void LCD_SetRotation(lcd_rotation_t rotation)
+{
+  LCD_Rotation = rotation;
+  LCD_WriteCommand(0x36);  // MADCTL
+  
+  switch (rotation) {
+    case LCD_ROTATION_0:   // Portrait 0°: 240x320
+      LCD_WriteData(MADCTL_RGB);
+      break;
+    case LCD_ROTATION_90:  // Landscape 90°: 320x240
+      LCD_WriteData(MADCTL_MV | MADCTL_MY | MADCTL_RGB);
+      break;
+    case LCD_ROTATION_180: // Portrait 180°: 240x320
+      LCD_WriteData(MADCTL_MX | MADCTL_MY | MADCTL_RGB);
+      break;
+    case LCD_ROTATION_270: // Landscape 270°: 320x240
+      LCD_WriteData(MADCTL_MV | MADCTL_MX | MADCTL_RGB);
+      break;
+  }
+}

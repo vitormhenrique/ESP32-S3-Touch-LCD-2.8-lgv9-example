@@ -7,9 +7,8 @@
 #include "Display_ST7789.h"
 #include "Touch_CST328.h"
 
-#define LVGL_WIDTH     LCD_WIDTH
-#define LVGL_HEIGHT    LCD_HEIGHT
-#define LVGL_BUF_LEN  (LVGL_WIDTH * LVGL_HEIGHT / 10)
+/* LVGL dimensions - use dynamic values from LCD driver */
+#define LVGL_BUF_LEN  (LCD_WIDTH * LCD_HEIGHT / 10)
 
 #define EXAMPLE_LVGL_TICK_PERIOD_MS  2
 
@@ -19,5 +18,7 @@ void Lvgl_Display_LCD(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map
 void Lvgl_Touchpad_Read(lv_indev_t * indev, lv_indev_data_t * data);                // Read the touchpad
 void example_increase_lvgl_tick(void *arg);
 
-void Lvgl_Init(void);
+void Lvgl_Init(void);                                   // Initialize with default rotation (0°)
+void Lvgl_InitWithRotation(lcd_rotation_t rotation);    // Initialize with specific hardware rotation
+void Lvgl_SetRotation(lcd_rotation_t rotation);         // Change rotation at runtime
 void Lvgl_Loop(void);

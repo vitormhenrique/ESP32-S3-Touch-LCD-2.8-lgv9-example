@@ -35,8 +35,8 @@ lv_obj_set_style_text_opa(ui_Label1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 ui_Button2 = lv_button_create(ui_Screen2);
 lv_obj_set_width( ui_Button2, 76);
 lv_obj_set_height( ui_Button2, 25);
-lv_obj_set_x( ui_Button2, -9 );
-lv_obj_set_y( ui_Button2, -17 );
+lv_obj_set_x( ui_Button2, 77 );
+lv_obj_set_y( ui_Button2, -89 );
 lv_obj_set_align( ui_Button2, LV_ALIGN_CENTER );
 lv_obj_add_flag( ui_Button2, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
 lv_obj_remove_flag( ui_Button2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags

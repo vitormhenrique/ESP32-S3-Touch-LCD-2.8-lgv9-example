@@ -7,6 +7,14 @@
 #define LCD_WIDTH   240 //LCD width
 #define LCD_HEIGHT  320 //LCD height
 
+/* Screen rotation options */
+typedef enum {
+    LCD_ROTATION_0   = 0,   // Portrait (default): 240x320
+    LCD_ROTATION_90  = 1,   // Landscape: 320x240
+    LCD_ROTATION_180 = 2,   // Portrait inverted: 240x320
+    LCD_ROTATION_270 = 3    // Landscape inverted: 320x240
+} lcd_rotation_t;
+
 #define SPIFreq                        80000000
 #define EXAMPLE_PIN_NUM_MISO           -1
 #define EXAMPLE_PIN_NUM_MOSI           45
@@ -30,8 +38,14 @@
 
 
 extern uint8_t LCD_Backlight;
+extern lcd_rotation_t LCD_Rotation;
+
+/* Get current display dimensions based on rotation */
+uint16_t LCD_GetWidth(void);
+uint16_t LCD_GetHeight(void);
 
 void LCD_SetCursor(uint16_t x1, uint16_t y1, uint16_t x2,uint16_t y2);
+void LCD_SetRotation(lcd_rotation_t rotation);
 
 void LCD_Init(void);
 void LCD_SetCursor(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t  Yend);

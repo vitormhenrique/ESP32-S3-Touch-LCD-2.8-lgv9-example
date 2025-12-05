@@ -47,8 +47,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -8,
-                  -14
+                  -106,
+                  -52
                 ],
                 "InheritedType": 7
               },
@@ -249,8 +249,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -31,
-                  -66
+                  -32,
+                  -79
                 ],
                 "InheritedType": 7
               },
@@ -660,8 +660,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -9,
-                  -17
+                  77,
+                  -89
                 ],
                 "InheritedType": 7
               },
@@ -976,7 +976,7 @@
     "theme_color1": 5,
     "theme_color2": 0,
     "custom_variable_prefix": "uic",
-    "backup_cnt": 5,
+    "backup_cnt": 8,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "9.1.0",

@@ -71,5 +71,6 @@ uint8_t CST328_Touch_Reset(void);
 uint16_t CST328_Read_cfg(void);
 uint8_t Touch_Read_Data(void);
 uint8_t Touch_Get_XY(uint16_t *x, uint16_t *y, uint16_t *strength, uint8_t *point_num, uint8_t max_point_num);
+void Touch_TransformCoordinates(uint16_t *x, uint16_t *y);
 void example_touchpad_read(void);
 void IRAM_ATTR Touch_CST328_ISR(void);

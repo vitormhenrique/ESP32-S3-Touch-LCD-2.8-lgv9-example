@@ -1,4 +1,6 @@
 #include "Touch_CST328.h"
+#include "Display_ST7789.h"  // For LCD_Rotation and LCD dimensions
+
 struct CST328_Touch touch_data = {0};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +169,47 @@ void example_touchpad_read(void){
       // data->state = LV_INDEV_STATE_REL;
   }
 }
+
+/******************************************************************************
+function: Transform touch coordinates based on display rotation
+parameter:
+    x, y: pointers to touch coordinates (will be modified in place)
+    
+The touch panel always reports in the same orientation (portrait 0°).
+This function transforms coordinates to match the current display rotation.
+******************************************************************************/
+void Touch_TransformCoordinates(uint16_t *x, uint16_t *y)
+{
+  uint16_t raw_x = *x;
+  uint16_t raw_y = *y;
+  
+  switch (LCD_Rotation) {
+    case LCD_ROTATION_0:   // Portrait 0° - no transformation needed
+      // Touch panel native orientation matches display
+      break;
+      
+    case LCD_ROTATION_90:  // Landscape 90° CW
+      // Display rotated 90° CW: touch must also rotate 90° CW
+      // new_x = (LCD_HEIGHT - 1 - raw_y), new_y = raw_x
+      *x = LCD_HEIGHT - 1 - raw_y;
+      *y = raw_x;
+      break;
+      
+    case LCD_ROTATION_180: // Portrait 180°
+      // Invert both axes
+      *x = LCD_WIDTH - 1 - raw_x;
+      *y = LCD_HEIGHT - 1 - raw_y;
+      break;
+      
+    case LCD_ROTATION_270: // Landscape 270° CW (90° CCW)
+      // Display rotated 270° CW: touch must also rotate 270° CW
+      // new_x = raw_y, new_y = (LCD_WIDTH - 1 - raw_x)
+      *x = raw_y;
+      *y = LCD_WIDTH - 1 - raw_x;
+      break;
+  }
+}
+
 /*!
     @brief  handle interrupts
 */
