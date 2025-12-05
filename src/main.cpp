@@ -9,6 +9,7 @@
 #include "LVGL_Example.h"
 #include "BAT_Driver.h"
 #include "Wireless.h"
+#include "ui/ui.h"
 
 void DriverTask(void *parameter) {
   Wireless_Test2();
@@ -46,7 +47,9 @@ void setup()
   LCD_Init();
   Lvgl_Init();
 
-  Lvgl_Example1();
+  ui_init();  
+
+  // Lvgl_Example1();
   // lv_demo_widgets();               
   // lv_demo_benchmark();          
   // lv_demo_keypad_encoder();     
