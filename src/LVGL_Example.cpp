@@ -73,7 +73,7 @@ void Lvgl_Example1(void){
   font_large = LV_FONT_DEFAULT;                             
   font_normal = LV_FONT_DEFAULT;                         
   
-  lv_coord_t tab_h;
+  int32_t tab_h;
   tab_h = 45;
   #if LV_FONT_MONTSERRAT_18
     font_large     = &lv_font_montserrat_18;
@@ -100,21 +100,23 @@ void Lvgl_Example1(void){
   lv_style_set_border_width(&style_bullet, 0);
   lv_style_set_radius(&style_bullet, LV_RADIUS_CIRCLE);
 
-  tv = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, tab_h);
+  tv = lv_tabview_create(lv_scr_act());
+  lv_tabview_set_tab_bar_position(tv, LV_DIR_TOP);
+  lv_tabview_set_tab_bar_size(tv, tab_h);
 
   lv_obj_set_style_text_font(lv_scr_act(), font_normal, 0);
 
   if(disp_size == DISP_LARGE) {
-    lv_obj_t * tab_btns = lv_tabview_get_tab_btns(tv);
+    lv_obj_t * tab_btns = lv_tabview_get_tab_bar(tv);
     lv_obj_set_style_pad_left(tab_btns, LV_HOR_RES / 2, 0);
-    lv_obj_t * logo = lv_img_create(tab_btns);
-    LV_IMG_DECLARE(img_lvgl_logo);
-    lv_img_set_src(logo, &img_lvgl_logo);
+    lv_obj_t * logo = lv_image_create(tab_btns);
+    LV_IMAGE_DECLARE(img_lvgl_logo);
+    lv_image_set_src(logo, &img_lvgl_logo);
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
     lv_obj_t * label = lv_label_create(tab_btns);
     lv_obj_add_style(label, &style_title, 0);
-    lv_label_set_text(label, "LVGL v8");
+    lv_label_set_text(label, "LVGL v9");
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
     label = lv_label_create(tab_btns);
@@ -135,9 +137,9 @@ void Lvgl_Example1(void){
 void Lvgl_Example1_close(void)
 {
   /*Delete all animation*/
-  lv_anim_del(NULL, NULL);
+  lv_anim_delete(NULL, NULL);
 
-  lv_timer_del(meter2_timer);
+  lv_timer_delete(meter2_timer);
   meter2_timer = NULL;
 
   lv_obj_clean(lv_scr_act());
@@ -238,14 +240,14 @@ static void Onboard_create(lv_obj_t * parent)
   lv_obj_add_event_cb(Backlight_slider, Backlight_adjustment_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
 
-  static lv_coord_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-  static lv_coord_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+  static int32_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+  static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
   lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
 
 
   /*Create the top panel*/
-  static lv_coord_t grid_1_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-  static lv_coord_t grid_1_row_dsc[] = {
+  static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+  static int32_t grid_1_row_dsc[] = {
     LV_GRID_CONTENT,  /*Title*/
     5,                /*Separator*/
     LV_GRID_CONTENT,  /*Box title*/
@@ -313,7 +315,7 @@ void IRAM_ATTR example1_increase_lvgl_tick(lv_timer_t * t)
 static void Music_create(lv_obj_t * parent)
 {
   static lv_obj_t * ctrl;
-  original_screen_bg_color = lv_obj_get_style_bg_color(parent, 0);
+  original_screen_bg_color = lv_obj_get_style_bg_color(parent, (lv_part_t)LV_PART_MAIN);
   lv_obj_set_style_bg_color(parent, lv_color_hex(0x343247), 0);
 
   ctrl = _lv_demo_music_main_create(parent);
@@ -324,7 +326,7 @@ static void color_changer_create(lv_obj_t * parent)
 {
     static lv_palette_t palette[] = {
         LV_PALETTE_BLUE, LV_PALETTE_GREEN, LV_PALETTE_BLUE_GREY,  LV_PALETTE_ORANGE,
-        LV_PALETTE_RED, LV_PALETTE_PURPLE, LV_PALETTE_TEAL, _LV_PALETTE_LAST
+        LV_PALETTE_RED, LV_PALETTE_PURPLE, LV_PALETTE_TEAL, LV_PALETTE_LAST
     };
 
     lv_obj_t * color_cont = lv_obj_create(parent);
@@ -344,7 +346,7 @@ static void color_changer_create(lv_obj_t * parent)
     lv_obj_align(color_cont, LV_ALIGN_BOTTOM_RIGHT, - LV_DPX(10),  - LV_DPX(10));
 
     uint32_t i;
-    for(i = 0; palette[i] != _LV_PALETTE_LAST; i++) {
+    for(i = 0; palette[i] != LV_PALETTE_LAST; i++) {
         lv_obj_t * c = lv_btn_create(color_cont);
         lv_obj_set_style_bg_color(c, lv_palette_main(palette[i]), 0);
         lv_obj_set_style_radius(c, LV_RADIUS_CIRCLE, 0);
@@ -355,7 +357,7 @@ static void color_changer_create(lv_obj_t * parent)
     }
 
     lv_obj_t * btn = lv_btn_create(parent);
-    lv_obj_add_flag(btn, LV_OBJ_FLAG_FLOATING | LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(btn, (lv_obj_flag_t)(LV_OBJ_FLAG_FLOATING | LV_OBJ_FLAG_CLICKABLE));
     lv_obj_set_style_bg_color(btn, lv_color_white(), LV_STATE_CHECKED);
     lv_obj_set_style_pad_all(btn, 10, 0);
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
@@ -376,8 +378,8 @@ static void color_changer_create(lv_obj_t * parent)
 static void color_changer_anim_cb(void * var, int32_t v)
 {
     lv_obj_t * obj =(lv_obj_t *) var;
-    lv_coord_t max_w = lv_obj_get_width(lv_obj_get_parent(obj)) - LV_DPX(20);
-    lv_coord_t w;
+    int32_t max_w = lv_obj_get_width(lv_obj_get_parent(obj)) - LV_DPX(20);
+    int32_t w;
 
     if(disp_size == DISP_SMALL) {
         w = lv_map(v, 0, 256, LV_DPX(52), max_w);
@@ -426,7 +428,7 @@ static void color_changer_event_cb(lv_event_t * e)
 static void color_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_FOCUSED) {
         lv_obj_t * color_cont = lv_obj_get_parent(obj);
@@ -443,7 +445,7 @@ static void color_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_CLICKED) {
         lv_palette_t * palette_primary = (lv_palette_t *)lv_event_get_user_data(e);
         lv_palette_t palette_secondary =(lv_palette_t) ((*palette_primary) + 3); /*Use another palette as secondary*/
-        if(palette_secondary >= _LV_PALETTE_LAST) palette_secondary =(lv_palette_t)(0);
+        if(palette_secondary >= LV_PALETTE_LAST) palette_secondary =(lv_palette_t)(0);
 #if LV_USE_THEME_DEFAULT
         lv_theme_default_init(NULL, lv_palette_main(*palette_primary), lv_palette_main(palette_secondary),
                               LV_THEME_DEFAULT_DARK, font_normal);
@@ -456,7 +458,7 @@ static void color_event_cb(lv_event_t * e)
 }
 
 void Backlight_adjustment_event_cb(lv_event_t * e) {
-  uint8_t Backlight = lv_slider_get_value(lv_event_get_target(e));  
+  uint8_t Backlight = lv_slider_get_value(lv_event_get_target_obj(e));  
   if (Backlight >= 0 && Backlight <= Backlight_MAX)  {
     lv_slider_set_value(Backlight_slider, Backlight, LV_ANIM_ON); 
     LCD_Backlight = Backlight;
@@ -475,10 +477,10 @@ static void ta_event_cb(lv_event_t * e)
 static void birthday_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * ta = lv_event_get_target(e);
+    lv_obj_t * ta = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_FOCUSED) {
-        if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_POINTER) {
+        if(lv_indev_get_type(lv_indev_active()) == LV_INDEV_TYPE_POINTER) {
             if(calendar == NULL) {
                 lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
                 calendar = lv_calendar_create(lv_layer_top());
@@ -510,7 +512,7 @@ static void calendar_event_cb(lv_event_t * e)
         lv_snprintf(buf, sizeof(buf), "%02d.%02d.%d", d.day, d.month, d.year);
         lv_textarea_set_text(ta, buf);
 
-        lv_obj_del(calendar);
+        lv_obj_delete(calendar);
         calendar = NULL;
         lv_obj_clear_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
